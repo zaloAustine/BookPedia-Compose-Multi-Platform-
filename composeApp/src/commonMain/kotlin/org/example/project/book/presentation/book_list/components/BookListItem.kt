@@ -49,13 +49,14 @@ import kotlin.math.round
 
 @Composable
 fun BookListItem(
-    modifier: Modifier = Modifier,
     book: Book,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
         shape = RoundedCornerShape(32.dp),
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier
+            .clickable(onClick = onClick),
         color = LightBlue.copy(alpha = 0.2f)
     ) {
         Row(
@@ -68,15 +69,12 @@ fun BookListItem(
         ) {
             Box(
                 modifier = Modifier
-                    .height(100.dp)
-                    .weight(0.3f),
+                    .height(100.dp),
                 contentAlignment = Alignment.Center
-
             ) {
                 var imageLoadResult by remember {
                     mutableStateOf<Result<Painter>?>(null)
                 }
-
                 val painter = rememberAsyncImagePainter(
                     model = book.imageUrl,
                     onSuccess = {
@@ -84,7 +82,7 @@ fun BookListItem(
                             if (it.painter.intrinsicSize.width > 1 && it.painter.intrinsicSize.height > 1) {
                                 Result.success(it.painter)
                             } else {
-                                Result.failure(Exception("Invalid Image Size"))
+                                Result.failure(Exception("Invalid image size"))
                             }
                     },
                     onError = {
@@ -92,14 +90,22 @@ fun BookListItem(
                         imageLoadResult = Result.failure(it.result.throwable)
                     }
                 )
+
                 val painterState by painter.state.collectAsStateWithLifecycle()
                 val transition by animateFloatAsState(
-                    targetValue = if (painterState is AsyncImagePainter.State.Success) 1f else 0f,
+                    targetValue = if(painterState is AsyncImagePainter.State.Success) {
+                        1f
+                    } else {
+                        0f
+                    },
                     animationSpec = tween(durationMillis = 800)
                 )
 
                 when (val result = imageLoadResult) {
-                    null -> CircularProgressIndicator()
+
+                    null -> {
+                        CircularProgressIndicator()
+                    }
                     else -> {
                         Image(
                             painter = if (result.isSuccess) painter else {
@@ -111,20 +117,21 @@ fun BookListItem(
                             } else {
                                 ContentScale.Fit
                             },
-                            modifier = modifier.aspectRatio(
-                                ratio = 0.65f,
-                                matchHeightConstraintsFirst = true
-                            ).graphicsLayer {
-                                rotationX = (1f - transition) * 30f
-                                val scale = 0.8f + (0.2f * transition)
-                                scaleX = scale
-                                scaleY = scale
-                            }
+                            modifier = Modifier
+                                .aspectRatio(
+                                    ratio = 0.65f,
+                                    matchHeightConstraintsFirst = true
+                                )
+                                .graphicsLayer {
+                                    rotationX = (1f - transition) * 30f
+                                    val scale = 0.8f + (0.2f * transition)
+                                    scaleX = scale
+                                    scaleY = scale
+                                }
                         )
                     }
                 }
             }
-
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -137,36 +144,35 @@ fun BookListItem(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
-                book.authors.firstOrNull()?.let {
+                book.authors.firstOrNull()?.let { authorName ->
                     Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodyMedium,
+                        text = authorName,
+                        style = MaterialTheme.typography.bodyLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-
                 book.averageRating?.let { rating ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = "${round(rating * 10) / 10.0}",
                             style = MaterialTheme.typography.bodyMedium
                         )
-
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
-                            tint = SandYellow,
-                            modifier = Modifier.size(36.dp)
+                            tint = SandYellow
                         )
                     }
                 }
             }
-
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                modifier = Modifier.size(34.dp)
+                modifier = Modifier
+                    .size(36.dp)
             )
         }
     }

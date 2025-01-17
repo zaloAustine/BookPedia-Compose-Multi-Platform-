@@ -85,6 +85,13 @@ fun BookListScreen(
         searchResultListState.animateScrollToItem(0)
     }
 
+    LaunchedEffect(state.selectedTabIndex){
+        pagerState.animateScrollToPage(state.selectedTabIndex)
+    }
+
+    LaunchedEffect(pagerState.currentPage){
+        onAction(BookListAction.OnTabSelected(pagerState.currentPage))
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -186,8 +193,7 @@ fun BookListScreen(
                                             Text(
                                                 text = stringResource(Res.string.no_search_results),
                                                 textAlign = TextAlign.Center,
-                                                style = MaterialTheme.typography.headlineSmall,
-                                                color = MaterialTheme.colorScheme.error
+                                                style = MaterialTheme.typography.headlineSmall
                                             )
                                         }
 
@@ -197,6 +203,7 @@ fun BookListScreen(
                                                 onBookClick = {
                                                     onAction(BookListAction.OnBookClick(it))
                                                 },
+                                                modifier = Modifier.fillMaxSize(),
                                                 scrollState = searchResultListState
                                             )
                                         }

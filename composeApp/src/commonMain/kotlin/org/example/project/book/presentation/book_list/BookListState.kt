@@ -16,7 +16,7 @@ val books = (1..10).map {
     Book(
 id = it.toString(),
         title = "Book $it",
-        imageUrl = "https://picsum.photos/200p",
+        imageUrl = "https://picsum.photos/200",
         authors = listOf("Zalo Austine"),
         description = "Description $it",
         language = emptyList(),
